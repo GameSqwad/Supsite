@@ -1,16 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Мой сайт</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Погода</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #weather-info {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="block">
-      <img src="Picsart_24-01-23_11-54-05-204.png" alt="Картинка">
-      <div class="text">УЖЕ В РЕЛИЗЕ</div>
-      <a href="supsite.netlify.app/SUP" class="button">Подробнее</a>
-    </div>
-  </div>
+    <h1>Погода</h1>
+    <button onclick="getWeatherData()">Получить погоду</button>
+    <div id="weather-info"></div>
+
+    <script>
+        function getWeatherData() {
+            // Запрашиваем разрешение на получение геоданных
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                // Делаем запрос к Яндекс.Погоде
+                var apiUrl = "https://api.weather.yandex.ru/v2/forecast?lat=" + latitude + "&lon=" + longitude + "&lang=ru_RU";
+                var apiKey = "d939aca1-6961-4dcc-9735-c65ac83e4b9e"; // Замените на Ваш API-ключ Яндекс.Погоды
+
+                fetch(apiUrl, {
+                    headers: {
+                        "X-Yandex-API-Key": apiKey
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Отображаем информацию о погоде
+                    var weatherInfo = document.getElementById("weather-info");
+                    weatherInfo.innerHTML = "<h2>Текущая погода</h2>";
+                    weatherInfo.innerHTML += "Температура: " + data.fact.temp + "°C<br>";
+                    weatherInfo.innerHTML += "Описание: " + data.fact.condition + "<br>";
+                    weatherInfo.innerHTML += "Скорость ветра: " + data.fact.wind_speed + " м/с";
+                })
+                .catch(error => {
+                    console.error("Ошибка при получении данных о погоде:", error);
+                    weatherInfo.innerHTML = "Произошла ошибка при получении данных о погоде.";
+                });
+            }, function(error) {
+                console.error("Ошибка при получении геоданных:", error);
+                var weatherInfo = document.getElementById("weather-info");
+                weatherInfo.innerHTML = "Произошла ошибка при получении геоданных.";
+            });
+        }
+    </script>
 </body>
 </html>
